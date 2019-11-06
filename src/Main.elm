@@ -6,6 +6,7 @@ import Html.Attributes exposing (src)
 import RemoteData exposing (WebData)
 import Http
 import Json.Decode exposing (..)
+import Debug exposing (toString)
 
 ---- MODEL ----
 
@@ -29,9 +30,7 @@ type Msg
     = NoOp
     | FunctionResponse (WebData TokenAndUrl)
 
-type alias TokenAndUrl = {
-    token: String,
-    url: String }
+type alias TokenAndUrl = { response: List String }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -46,14 +45,16 @@ callFunction: Cmd Msg
 callFunction =
     Http.get { 
         expect = Http.expectJson (RemoteData.fromResult >> FunctionResponse) decodeTokenAndUrl,
-        url = ".netlify/functions/dantb-first-function" 
+        url = url
     }
+
+listDecoder : Decoder (List String)
+listDecoder = Json.Decode.list Json.Decode.string
 
 decodeTokenAndUrl : Decoder TokenAndUrl
 decodeTokenAndUrl =
-    Json.Decode.map2 TokenAndUrl
-        (field "api-token" Json.Decode.string)
-        (field "api-url" Json.Decode.string)
+    Json.Decode.map TokenAndUrl
+        (field "response" listDecoder)
 
 ---- VIEW ----
 
@@ -71,8 +72,7 @@ view model =
             text "Error."
 
         RemoteData.Success tokenAndUrl -> 
-            text ("Hi Josh, hi Rosen, let's build a sweet product!\nResults from Netlify function on " ++ url ++ 
-            "\nApi Token: " ++ tokenAndUrl.token ++ ", Api Url: " ++ tokenAndUrl.url)
+            text ("This is an elm app calling a Netlify function on url " ++ url ++ "\nResponse:\n" ++ (toString tokenAndUrl.response))
 
 
 
