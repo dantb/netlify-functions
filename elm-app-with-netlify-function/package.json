@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/dantb/netlify-functions/issues"
   },
-  "homepage": "https://github.com/dantb/netlify-functions#readme"
+  "homepage": "https://github.com/dantb/netlify-functions#readme",
+  "devDependencies": {
+    "create-elm-app": "^4.1.1"
+  }
 }
