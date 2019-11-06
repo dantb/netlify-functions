@@ -19,6 +19,8 @@ init =
     ( Model RemoteData.NotAsked, callFunction)
 
 
+url : String
+url = ".netlify/functions/dantb-first-function"
 
 ---- UPDATE ----
 
@@ -69,7 +71,8 @@ view model =
             text "Error."
 
         RemoteData.Success tokenAndUrl -> 
-            text ("Api Token: " ++ tokenAndUrl.token ++ ", Api Url: " ++ tokenAndUrl.url)
+            text ("Hi Josh, hi Rosen, let's build a sweet product!\nResults from Netlify function on " ++ url ++ 
+            "\nApi Token: " ++ tokenAndUrl.token ++ ", Api Url: " ++ tokenAndUrl.url)
 
 
 
