@@ -12,7 +12,7 @@ import Debug exposing (toString)
 
 
 type alias Model = {
-    tokenAndUrl: WebData TokenAndUrl }
+    lambdaResponse: WebData LambdaResponse }
 
 
 init : ( Model, Cmd Msg )
@@ -28,15 +28,15 @@ url = ".netlify/functions/dantb-first-function"
 
 type Msg
     = NoOp
-    | FunctionResponse (WebData TokenAndUrl)
+    | FunctionResponse (WebData LambdaResponse)
 
-type alias TokenAndUrl = { response: List String }
+type alias LambdaResponse = { response: List String }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FunctionResponse tokenAndUrl ->
-            ( { model | tokenAndUrl = tokenAndUrl }, Cmd.none)
+        FunctionResponse lambdaResponse ->
+            ( { model | lambdaResponse = lambdaResponse }, Cmd.none)
         _ ->
             ( model, Cmd.none )
 
@@ -44,16 +44,16 @@ update msg model =
 callFunction: Cmd Msg
 callFunction =
     Http.get { 
-        expect = Http.expectJson (RemoteData.fromResult >> FunctionResponse) decodeTokenAndUrl,
+        expect = Http.expectJson (RemoteData.fromResult >> FunctionResponse) decodeLambdaResponse,
         url = url
     }
 
 listDecoder : Decoder (List String)
 listDecoder = Json.Decode.list Json.Decode.string
 
-decodeTokenAndUrl : Decoder TokenAndUrl
-decodeTokenAndUrl =
-    Json.Decode.map TokenAndUrl
+decodeLambdaResponse : Decoder LambdaResponse
+decodeLambdaResponse =
+    Json.Decode.map LambdaResponse
         (field "response" listDecoder)
 
 ---- VIEW ----
@@ -61,7 +61,7 @@ decodeTokenAndUrl =
 
 view : Model -> Html Msg
 view model =
-    case model.tokenAndUrl of
+    case model.lambdaResponse of
         RemoteData.NotAsked -> 
             text "Initialising."
 
@@ -71,8 +71,8 @@ view model =
         RemoteData.Failure err -> 
             text "Error."
 
-        RemoteData.Success tokenAndUrl -> 
-            text ("This is an elm app calling a Netlify function on url " ++ url ++ "\nResponse:\n" ++ (toString tokenAndUrl.response))
+        RemoteData.Success lambdaResponse -> 
+            text ("This is an elm app calling a Netlify function on url " ++ url ++ "\nResponse:\n" ++ (toString lambdaResponse.response))
 
 
 
