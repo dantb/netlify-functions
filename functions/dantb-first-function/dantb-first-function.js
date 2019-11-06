@@ -1,86 +1,24 @@
-module Main exposing (..)
+// If you add things to the package.json in this directory, you can magically require them here
+// Netlify takes care of all the things
+// const axios = require("axios");
 
-import Browser
-import Html exposing (Html, text, div, h1, img, p)
-import Html.Attributes exposing (src)
-import RemoteData exposing (WebData)
-import Http
-import Json.Decode exposing (..)
+exports.handler = function(event, context, callback) {
+  // Get some env var values defined in our Netlify site UI
+  const { API_TOKEN, API_URL } = process.env;
 
----- MODEL ----
+  // You can log some stuff here to aid  debugging
+  console.log("Injecting token to", API_URL);
 
-
-type alias Model = {
-    tokenAndUrl: WebData TokenAndUrl }
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( Model RemoteData.NotAsked, callFunction)
-
-
-
----- UPDATE ----
-
-
-type Msg
-    = NoOp
-    | FunctionResponse (WebData TokenAndUrl)
-
-type alias TokenAndUrl = {
-    token: String,
-    url: String }
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        FunctionResponse tokenAndUrl ->
-            ( { model | tokenAndUrl = tokenAndUrl }, Cmd.none)
-        _ ->
-            ( model, Cmd.none )
-
-
-callFunction: Cmd Msg
-callFunction =
-    Http.get { 
-        expect = Http.expectJson (RemoteData.fromResult >> FunctionResponse) decodeTokenAndUrl,
-        url = ".netlify/functions/call-api" 
-    }
-
-decodeTokenAndUrl : Decoder TokenAndUrl
-decodeTokenAndUrl =
-    Json.Decode.map2 TokenAndUrl
-        (field "api-token" Json.Decode.string)
-        (field "api-url" Json.Decode.string)
-
----- VIEW ----
-
-
-view : Model -> Html Msg
-view model =
-    case model.tokenAndUrl of
-        RemoteData.NotAsked -> 
-            text "Initialising."
-
-        RemoteData.Loading -> 
-            text "Loading."
-            
-        RemoteData.Failure err -> 
-            text "Error."
-
-        RemoteData.Success tokenAndUrl -> 
-            text ("Api Token: " ++ tokenAndUrl.token ++ ", Api Url: " ++ tokenAndUrl.url)
-
-
-
----- PROGRAM ----
-
-
-main : Program () Model Msg
-main =
-    Browser.element
-        { view = view
-        , init = \_ -> init
-        , update = update
-        , subscriptions = always Sub.none
-        }
+  return callback(null, {
+    statusCode: 200,
+    headers: { 
+      "content-type": "application/json; charset=UTF-8",
+      "access-control-allow-origin": "*",
+      "access-control-expose-headers": "content-encoding,date,server,content-length"
+    },
+    body: JSON.stringify({
+      "api-token": API_TOKEN,
+      "api-url": API_URL
+    })
+  })
+}
