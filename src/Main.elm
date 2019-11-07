@@ -21,7 +21,7 @@ init =
 
 
 url : String
-url = ".netlify/functions/dantb-first-function"
+url = ".netlify/functions/first-purescript-function"
 
 ---- UPDATE ----
 
