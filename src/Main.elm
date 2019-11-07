@@ -6,7 +6,7 @@ import Html.Attributes exposing (src)
 import RemoteData exposing (WebData)
 import Http
 import Json.Decode exposing (..)
-import Debug exposing (toString)
+import String
 
 ---- MODEL ----
 
@@ -72,7 +72,7 @@ view model =
             text "Error."
 
         RemoteData.Success lambdaResponse -> 
-            text ("This is an elm app calling a Netlify function on url " ++ url ++ "\nResponse:\n" ++ (toString lambdaResponse.response))
+            text ("This is an elm app calling a Netlify function on url " ++ url ++ "\nResponse:\n" ++ (String.join " " lambdaResponse.response))
 
 
 
