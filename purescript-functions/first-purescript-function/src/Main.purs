@@ -1,26 +1,25 @@
 module Main where
 
-import Prelude hiding (apply)
-import Effect (Effect)
-import Effect.Console (log)
-import Node.Express.Types (Application)
-import Node.Express.App (App, listenHttp, get)
-import Node.Express.Response (send)
-import Node.HTTP (Server)
-import Simple.JSON as JSON
+import Node.Express.App (App, get)
+import Node.Express.Handler (Handler)
+import Node.Express.Response (sendJson)
+import Network.AWS.Lambda.Express as Lambda
 
-foreign import realMain :: (Application -> Effect Server) -> Effect Server
-
-type MyResponseAlias = { response :: Array String }
+-- Define an Express web app
 
 responseVal :: Array String
 responseVal = ["Hi Josh, Rosen and peeping Thom.", "This", "data", "comes", "from", "a", "purescript", "netlify", "function"]
 
-app :: App
-app = get "/" $ send (JSON.writeJSON ({ response : responseVal } :: MyResponseAlias))
+indexHandler :: Handler
+indexHandler = do
+  sendJson { data: responseVal }
 
-main :: Effect Server
-main = do
-    listenHttp app 3000 \_ ->
-        log $ "Listening on " <> show 3000
-        
+app :: App
+app = do
+  get "/" indexHandler
+
+-- Define the AWS Lambda handler
+
+handler :: Lambda.HttpHandler
+handler =
+  Lambda.makeHandler app

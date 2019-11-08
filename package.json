@@ -20,6 +20,11 @@
   },
   "homepage": "https://github.com/dantb/netlify-functions#readme",
   "devDependencies": {
-    "create-elm-app": "^4.1.1"
+    "create-elm-app": "^4.1.1",
+    "serverless-offline": "^5.12.0"
+  },
+  "dependencies": {
+    "aws-serverless-express": "^3.3.6",
+    "express": "^4.17.1"
   }
 }
